@@ -31,8 +31,15 @@ Route::get('signout', [AuthController::class, 'signOut'])->name('signout')->midd
 Route::get('product', [ProductController::class, 'index'])->name('products');
 Route::get('category', [CategoryController::class, 'index'])->name('categories');
 
+
 Route::get('mobile-legends', [MobileLegendsController::class, 'index'])->name('mobile-legends');
 Route::get('mobile-legends/fetch', [MobileLegendsController::class, 'fetch']);
+Route::post('mobile-legends/order', [MobileLegendsController::class, 'placeOrder'])->name('place.order.ml');
+Route::post('mobile-legends/checkout', [MobileLegendsController::class, 'executeOrder'])->name('execute.order.ml');
+Route::get('mobile-legends/payment', [MobileLegendsController::class, 'payment'])->name('payment.order.ml');
+
+
+
 
 
 
@@ -42,10 +49,10 @@ Route::get('category/{id}', [CategoryController::class, 'show'])->name('categori
 Route::get('/order-items', [OrderController::class, 'index'])->name('order-items');
 Route::get('/order-items/{id}', [OrderController::class, 'show']);
 
-// API
-Route::get('/order/fetch', [OrderController::class, 'fetch']);
-Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('place.order');
-Route::get('/order/payment', [OrderController::class, 'payment'])->name('payment.order');
+// // API
+// Route::get('/order/fetch', [OrderController::class, 'fetch']);
+// Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('place.order');
+// Route::get('/order/payment', [OrderController::class, 'payment'])->name('payment.order');
 
 
 
