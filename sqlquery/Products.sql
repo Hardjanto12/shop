@@ -1,0 +1,35 @@
+DELETE FROM products;
+
+INSERT INTO products (id, product_serial_number, item, description, price, category_id)
+VALUES
+(1, 'ML-001', '100', '100 Diamonds for Mobile Legends', 20000, 1),
+(2, 'ML-002', '200', '200 Diamonds for Mobile Legends', 40000, 1),
+(3, 'ML-003', '300', '300 Diamonds for Mobile Legends', 60000, 1),
+(4, 'ML-004', '400', '400 Diamonds for Mobile Legends', 75000, 1),
+(5, 'ML-005', '600', '600 Diamonds for Mobile Legends', 90000, 1),
+(6, 'ML-006', '700', '700 Diamonds for Mobile Legends', 110000, 1),
+(7, 'ML-007', '800', '800 Diamonds for Mobile Legends', 125000, 1),
+(8, 'ML-008', '900', '900 Diamonds for Mobile Legends', 135000, 1),
+(9, 'ML-009', '1000', '1000 Diamonds for Mobile Legends', 150000, 1),
+(10, 'ML-010', '1500', '1500 Diamonds for Mobile Legends', 200000, 1),
+(11, 'PUBGM-001', '100', '100 UC for PUBG Mobile', 20000, 2),
+(12, 'PUBGM-002', '200', '200 UC for PUBG Mobile', 40000, 2),
+(13, 'PUBGM-003', '300', '300 UC for PUBG Mobile', 60000, 2),
+(14, 'PUBGM-004', '400', '400 UC for PUBG Mobile', 75000, 2),
+(15, 'PUBGM-005', '600', '600 UC for PUBG Mobile', 90000, 2),
+(16, 'PUBGM-006', '700', '700 UC for PUBG Mobile', 110000, 2),
+(17, 'PUBGM-007', '800', '800 UC for PUBG Mobile', 125000, 2),
+(18, 'PUBGM-008', '900', '900 UC for PUBG Mobile', 135000, 2),
+(19, 'PUBGM-009', '1000', '1000 UC for PUBG Mobile', 150000, 2),
+(20, 'PUBGM-010', '1500', '1500 UC for PUBG Mobile', 200000, 2),
+(21, 'VALO-001', '100', '100 Valorant Point for VALORANT', 20000, 3),
+(22, 'VALO-002', '200', '200 Valorant Point for VALORANT', 40000, 3),
+(23, 'VALO-003', '300', '300 Valorant Point for VALORANT', 60000, 3),
+(24, 'VALO-004', '400', '400 Valorant Point for VALORANT', 75000, 3),
+(25, 'VALO-005', '600', '600 Valorant Point for VALORANT', 90000, 3),
+(26, 'VALO-006', '700', '700 Valorant Point for VALORANT', 110000, 3),
+(27, 'VALO-007', '800', '800 Valorant Point for VALORANT', 125000, 3),
+(28, 'VALO-008', '900', '900 Valorant Point for VALORANT', 135000, 3),
+(29, 'VALO-009', '1000', '1000 Valorant Point for VALORANT', 150000, 3),
+(30, 'VALO-010', '1500', '1500 Valorant Point for VALORANT', 200000, 3);
+
