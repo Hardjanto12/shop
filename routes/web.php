@@ -38,6 +38,8 @@ Route::post('mobile-legends/order', [MobileLegendsController::class, 'placeOrder
 Route::get('mobile-legends/payment', [MobileLegendsController::class, 'payment'])->name('payment.order.ml');
 Route::post('mobile-legends/checkout', [MobileLegendsController::class, 'executeOrder'])->name('execute.order.ml');
 
+Route::get('transaction/success', [MobileLegendsController::class, 'success'])->name('transaction.success');
+
 
 
 

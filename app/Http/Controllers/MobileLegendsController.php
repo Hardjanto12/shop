@@ -156,6 +156,8 @@ class MobileLegendsController extends Controller
         $refId = $request->input('refId');
         $produk_id = OrderItem::where('order_serial_number', $refId)->get()->pluck('product_id')->first();
         $produkCode = Product::where('id', $produk_id)->get()->pluck('product_serial_number')->first();
+        $grossPrice = Product::where('id', $produk_id)->get()->pluck('price')->first();
+
         $tujuan = Order::where('order_serial_number', $refId)->get()->pluck('game_id')->first();
         $server_id = Order::where('order_serial_number', $refId)->get()->pluck('server_id')->first();
 
@@ -172,7 +174,7 @@ class MobileLegendsController extends Controller
             'signature' => md5($signature)
         ]);
 
-        // Periksa apakah permintaan berhasil
+        // // Periksa apakah permintaan berhasil
         if ($response->successful()) {
             // Proses respons
             $responseData = $response->json();
@@ -180,14 +182,25 @@ class MobileLegendsController extends Controller
             $order = Order::where('order_serial_number', $refId)->first();
             if ($order) {
                 $order->status = 'success';
+                $order->gross_price = $grossPrice;
                 $order->save();
             }
-            return $responseData;
+            return response()->json(['message' => 'Transaksi sukses', 'data' => $responseData]);
         } else {
             // Tangani kesalahan
+            if ($response->failed()) {
+                $errorMessage = "Terjadi masalah saat operasi pengambilan: Kesalahan: Respons jaringan tidak ok";
+                return response()->json(['error' => $errorMessage], 400);
+            }
             $statusCode = $response->status();
             $errorMessage = $response->body();
-            return  $errorMessage + $statusCode;
+            return response()->json(['error' => "Kesalahan: " . $errorMessage . " dengan kode status " . $statusCode], $statusCode);
         }
+    }
+
+    public function success(Request $request)
+    {
+        $refId = $request->session()->get('refId', 'Tidak ada referensi ID');
+        return view('transaction-success.index')->with('refId', $refId);
     }
 }

@@ -41,42 +41,45 @@
                 onSuccess: function(result) {
                     /* Setelah berhasil, lakukan pengiriman order_id melalui POST ke route 'mobile-legends/checkout' */
 
-                    // Get the refId value from the hidden input field
+                    // Dapatkan nilai refId dari hasil transaksi
                     var refId = result.order_id;
 
-                    // Define the data to be sent in the request body
+                    // Tentukan data yang akan dikirim dalam body request
                     var data = {
                         refId: refId
                     };
 
-                    // Define the URL of the route
+                    // Tentukan URL dari route
                     var url = "{{ route('execute.order.ml') }}";
 
-                    // Define the options for the fetch request
+                    // Tentukan opsi untuk request fetch
                     var options = {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token if your application uses CSRF protection
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Sertakan CSRF token jika aplikasi Anda menggunakan proteksi CSRF
                         },
                         body: JSON.stringify(data)
                     };
 
-                    // Send the POST request
+                    // Kirim request POST
                     fetch(url, options)
                         .then(response => {
                             if (!response.ok) {
-                                throw new Error('Network response was not ok');
+                                throw new Error('Respon jaringan tidak ok');
                             }
                             return response.json();
                         })
                         .then(data => {
-                            // Handle successful response
-                            console.log(data);
+                            // Handle respons sukses
+                            // Tambahkan refId ke URL sebagai query parameter
+                            window.location.href =
+                                "{{ route('transaction.success') }}" + "?refId=" +
+                                refId; // Redirect ke halaman sukses setelah berhasil dengan refId
                         })
                         .catch(error => {
                             // Handle error
-                            console.error('There was a problem with the fetch operation:', error);
+                            console.error('Ada masalah dengan operasi fetch:', error);
                         });
                 },
                 // Optional
