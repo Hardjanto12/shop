@@ -26,95 +26,118 @@ class MobileLegendsController extends Controller
 
         $categoryId = Category::where('slug', 'mobile-legends')->first();
         $products = Product::where('category_id', $categoryId->id)
-        ->orderBy('item')
-        ->get();
+            ->orderBy('item')
+            ->get();
 
         return view('orders.mobile-legends.index')->with(['product' => $products, 'jsonData' => $sortedData]);
 
         // return view('products.index', compact('products'));
     }
 
-    public function fetch(){
+    public function fetch()
+    {
         $response = Http::get('https://api.tokovoucher.id/produk/code?member_code=M240317FBIE2346GZ&signature=f8a6768c402b84dbf3583e41ad3e9825&kode=MLA');
 
-    if ($response->successful()) {
-        $data = $response->json();
-        $sortedData = collect($data['data'])->sortBy('id')->values()->all();
-        // Process fetched data
-        return view('orders.mobile-legends.fetch', ['jsonData' => $sortedData]);
-        // return view('orders.mobile-legends.fetch')->with('data', $data);
-    } else {
-        // Handle error
-        return response()->json(['error' => 'Failed to fetch data from API'], $response->status());
-    }
+        if ($response->successful()) {
+            $data = $response->json();
+            $sortedData = collect($data['data'])->sortBy('id')->values()->all();
+            // Process fetched data
+            return view('orders.mobile-legends.fetch', ['jsonData' => $sortedData]);
+            // return view('orders.mobile-legends.fetch')->with('data', $data);
+        } else {
+            // Handle error
+            return response()->json(['error' => 'Failed to fetch data from API'], $response->status());
+        }
     }
 
     public function placeOrder(Request $request)
     {
-         // Validate request data
-    $request->validate([
-        'game_id' => 'required',
-        'server_num' => 'required',
-        'email' => 'required',
-        'item' => 'required',
-        // Add more validation rules as needed
-    ]);
+        // Validate request data
+        $request->validate([
+            'game_id' => 'required',
+            'server_num' => 'required',
+            'email' => 'required',
+            'item' => 'required',
+            // Add more validation rules as needed
+        ]);
 
-    // Retrieve input data from the request
-    $game_id = $request->input('game_id');
-    $server_num = $request->input('server_num');
-    $email = $request->input('email');
-    $item = $request->input('item');
+        // Retrieve input data from the request
+        $game_id = $request->input('game_id');
+        $server_num = $request->input('server_num');
+        $email = $request->input('email');
+        $item = $request->input('item');
 
-    /* This line of code is querying the `Product` model to retrieve the `id` of a product based on the
+        /* This line of code is querying the `Product` model to retrieve the `id` of a product based on the
     provided `product_serial_number`.*/
-    $product_id = Product::where('product_serial_number', $item)->get()->pluck('id')->first();
-    $game = 'ML';
+        $product_id = Product::where('product_serial_number', $item)->get()->pluck('id')->first();
+        $product_price = Product::where('product_serial_number', $item)->get()->pluck('price')->first();
+        $game = 'ML';
 
-    // Start a database transaction
-    DB::beginTransaction();
+        // Start a database transaction
+        DB::beginTransaction();
+        try {
+            // Create a new order
+            // Order Header
+            $order = new Order();
+            $usercount = DB::table('orders')->count() + 1;
 
-    try {
-        // Create a new order
-        // Order Header
-        $order = new Order();
-
-        $usercount = DB::table('orders')->count() + 1;
-
-        /* The code block you provided is determining the user ID based on whether the user is authenticated or
+            /* The code block you provided is determining the user ID based on whether the user is authenticated or
         not. Here's a breakdown of what it does: */
-        if (Auth::check() == false) {
-            $user_id = "GUEST/" . sprintf ("%04d", $usercount) . '/' . $game_id ;
-        }
-        else{
-            $user_id = "USER/" . sprintf ("%04d", (Auth::user()->id)) . '/' . $game_id;
-        }
+            if (Auth::check() == false) {
+                $user_id = "GUEST/" . sprintf("%04d", $usercount) . '/' . $game_id;
+            } else {
+                $user_id = "USER/" . sprintf("%04d", (Auth::user()->id)) . '/' . $game_id;
+            }
 
-        $generate_serial_number = $game . date("dmy") . sprintf ("%04d", $usercount);
-        /*  generating a unique order serial number for the order being created. */
-        $order->order_serial_number = $generate_serial_number;
+            $generate_serial_number = $game . date("dmy") . sprintf("%04d", $usercount);
+            /*  generating a unique order serial number for the order being created. */
+            $order->order_serial_number = $generate_serial_number;
 
-        $order->customer_serial_number = $user_id;
-        $order->game_id = $game_id;
-        $order->server_num = $server_num;
-        $order->email = $email;
+            $order->customer_serial_number = $user_id;
+            $order->game_id = $game_id;
+            $order->server_num = $server_num;
+            $order->email = $email;
 
-        $order->save();
+            // Set your Merchant Server Key
+            \Midtrans\Config::$serverKey = config('midtrans.serverKey');
+            // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+            \Midtrans\Config::$isProduction = config('midtrans.isProduction');
+            // Set sanitization on (default)
+            \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
+            // Set 3DS transaction for credit card to true
+            \Midtrans\Config::$is3ds = config('midtrans.is3ds');
 
-        // Order Detail
-        $orderItem = new OrderItem();
+            $order->save();
 
-        /* The line is generating a unique order item serial number for the order item being created. */
-        $orderItem->order_item_serial_number = $game . '/' . sprintf ("%04d", $usercount) . '/' . $game_id  ;
-        $orderItem->order_serial_number = $generate_serial_number;
-        $orderItem->product_id = $product_id;
+            // Order Detail
+            $orderItem = new OrderItem();
 
-        $orderItem->save();
+            /* The line is generating a unique order item serial number for the order item being created. */
+            $orderItem->order_item_serial_number = $game . '/' . sprintf("%04d", $usercount) . '/' . $game_id;
+            $orderItem->order_serial_number = $generate_serial_number;
+            $orderItem->product_id = $product_id;
 
-        // Commit the transaction
-        DB::commit();
-        // return $orderid;
-        return redirect()->route('payment.order.ml')->with(['success'=> 'Your order has been placed successfully! Pay before 24 hours!', 'orderid'=> $generate_serial_number]);
+            $orderItem->save();
+
+            /* This block of code is responsible for generating a unique Snap token for the payment transaction
+        using the Midtrans payment gateway. Here's a breakdown of what it does: */
+
+            $params = array(
+                'transaction_details' => array(
+                    'order_id' => $generate_serial_number,
+                    'gross_amount' => $product_price,
+                ),
+            );
+
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+            $order->snap_token = $snapToken;
+            $order->save();
+
+            // Commit the transaction
+            DB::commit();
+            // return $orderid;
+            return redirect()->route('payment.order.ml')->with(['success' => 'Your order has been placed successfully! Pay before 24 hours!', 'orderid' => $generate_serial_number, 'snap_token' => $snapToken]);
         } catch (\Exception $e) {
             // Rollback the transaction if an exception occurs
             DB::rollBack();
@@ -122,11 +145,13 @@ class MobileLegendsController extends Controller
         }
     }
 
-    public function payment(){
+    public function payment()
+    {
         return view('payment.index');
     }
 
-    public function executeOrder(Request $request){
+    public function executeOrder(Request $request)
+    {
 
         $refId = $request->input('refId');
         $produk_id = OrderItem::where('order_serial_number', $refId)->get()->pluck('product_id')->first();
@@ -147,17 +172,22 @@ class MobileLegendsController extends Controller
             'signature' => md5($signature)
         ]);
 
-        // Check if the request was successful
+        // Periksa apakah permintaan berhasil
         if ($response->successful()) {
-            // Process the response
+            // Proses respons
             $responseData = $response->json();
-            dd($responseData);
+            // Update status order dari "pending" menjadi "success"
+            $order = Order::where('order_serial_number', $refId)->first();
+            if ($order) {
+                $order->status = 'success';
+                $order->save();
+            }
+            return $responseData;
         } else {
-            // Handle the error
+            // Tangani kesalahan
             $statusCode = $response->status();
             $errorMessage = $response->body();
+            return  $errorMessage + $statusCode;
         }
-
-        return "payment success";
     }
 }

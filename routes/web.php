@@ -35,10 +35,8 @@ Route::get('category', [CategoryController::class, 'index'])->name('categories')
 Route::get('mobile-legends', [MobileLegendsController::class, 'index'])->name('mobile-legends');
 Route::get('mobile-legends/fetch', [MobileLegendsController::class, 'fetch']);
 Route::post('mobile-legends/order', [MobileLegendsController::class, 'placeOrder'])->name('place.order.ml');
-Route::post('mobile-legends/checkout', [MobileLegendsController::class, 'executeOrder'])->name('execute.order.ml');
 Route::get('mobile-legends/payment', [MobileLegendsController::class, 'payment'])->name('payment.order.ml');
-
-
+Route::post('mobile-legends/checkout', [MobileLegendsController::class, 'executeOrder'])->name('execute.order.ml');
 
 
 

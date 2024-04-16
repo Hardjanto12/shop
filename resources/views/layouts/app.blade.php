@@ -29,4 +29,6 @@
     }
 </style>
 
+@yield('scripts')
+
 </html>

@@ -9,31 +9,87 @@
         @if (session('success'))
             <div class="p-4 my-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
                 role="alert">
-                <span class="font-medium">{{ session('success') }}<br>
+                <span class="font-medium">{{ session('success') }}</span><br>
             </div>
         @endif
 
-        {{-- <p>{{ $orderid }}</p> --}}
         <div class="p-4 my-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
             role="alert">
-            <span class="font-medium">Ref ID : {{ session('orderid') }}<br>
+            <span class="font-medium">Ref ID : {{ session('orderid') }}</span><br>
         </div>
 
-        <form action="{{ route('execute.order.ml') }}" method="post">
-            @csrf
-            <input type="hidden" id="refId" name="refId" value="{{ session('orderid') }}" class=""
-                placeholder="" />
-
-            <button type="submit"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                Bayar sekarang
-                <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 14 10">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M1 5h12m0 0L9 1m4 4L9 9" />
-                </svg>
-            </button>
-        </form>
-
+        <button id="pay-button"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            Bayar sekarang
+            <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 14 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+        </button>
+        {{-- <p>{{ session('snap_token') }}</p> --}}
     </div>
+@endsection
+
+@section('scripts')
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+    <script type="text/javascript">
+        document.getElementById('pay-button').onclick = function() {
+            // SnapToken acquired from previous step
+            snap.pay('{{ session('snap_token') }}', {
+                // Optional
+                onSuccess: function(result) {
+                    /* Setelah berhasil, lakukan pengiriman order_id melalui POST ke route 'mobile-legends/checkout' */
+
+                    // Get the refId value from the hidden input field
+                    var refId = result.order_id;
+
+                    // Define the data to be sent in the request body
+                    var data = {
+                        refId: refId
+                    };
+
+                    // Define the URL of the route
+                    var url = "{{ route('execute.order.ml') }}";
+
+                    // Define the options for the fetch request
+                    var options = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token if your application uses CSRF protection
+                        },
+                        body: JSON.stringify(data)
+                    };
+
+                    // Send the POST request
+                    fetch(url, options)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Handle successful response
+                            console.log(data);
+                        })
+                        .catch(error => {
+                            // Handle error
+                            console.error('There was a problem with the fetch operation:', error);
+                        });
+                },
+                // Optional
+                onPending: function(result) {
+                    /* You may add your own js here, this is just example */
+                    document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
+                },
+                // Optional
+                onError: function(result) {
+                    /* You may add your own js here, this is just example */
+                    document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
+                }
+            });
+        };
+    </script>
 @endsection
