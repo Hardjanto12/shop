@@ -3,6 +3,9 @@
 
 @section('title', 'Order')
 
+@section('styles')
+@endsection
+
 @section('content')
     <div class="container mt-8 grid place-items-center">
         <p class="text-second mt-4 text-6xl mb-12">{{ $product->first()->category->name . ' Order Form' ?? '' }}
@@ -37,7 +40,7 @@
 
                 {{-- /* The code snippet you provided is creating an input field for the user's email address within a form.
             Let's break down the HTML elements and their purposes: */ --}}
-                <div class="mb-2">
+                <div class="mb-4">
                     <label for="email" class="block mb-2 text-sm font-medium text-light-theme">Email</label>
                     <input type="email" id="email" name="email"
                         class="bg-gray-50 border border-gray-300 text-dark-theme text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
@@ -52,13 +55,6 @@
                         <option>
                             Pilih Item
                         </option>
-                        {{-- @foreach ($product as $p)
-                                <option value="{{ $p->product_serial_number }}">
-                                    {{ $p->item }}
-                                    DM - {{ $p->category->name }}
-                                </option>
-                            @endforeach --}}
-                        {{-- <li>{{ $item['nama_produk'] }} - @currency($item['price'])</li> --}}
                         @foreach ($jsonData as $item)
                             <option value="{{ $item['code'] }}">
                                 {{ $item['nama_produk'] }} - @currency($item['price'])
@@ -66,6 +62,24 @@
                         @endforeach
                     </select>
                 </div>
+
+                {{-- <div class="mb-4">
+                    <ul class="grid w-full gap-6 md:grid-cols-2">
+                        @foreach ($jsonData as $item)
+                            <li>
+                                <input type="radio" id="item" name="item" value="{{ $item['code'] }}"
+                                    class="hidden">
+                                <label for="item"
+                                    class="inline-flex items-center justify-between w-52 h-40 p-3 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                    <div class="block">
+                                        <div class="w-full text-lg font-semibold">{{ $item['nama_produk'] }}</div>
+                                        <div class="w-full">@currency($item['price'])</div>
+                                    </div>
+                                </label>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div> --}}
 
                 <div class="mb-2 grid place-items-center">
                     <button type="submit"

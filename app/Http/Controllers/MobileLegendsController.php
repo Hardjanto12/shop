@@ -178,6 +178,9 @@ class MobileLegendsController extends Controller
         if ($response->successful()) {
             // Proses respons
             $responseData = $response->json();
+
+            return $responseData;
+
             // Update status order dari "pending" menjadi "success"
             $order = Order::where('order_serial_number', $refId)->first();
             if ($order) {
@@ -185,7 +188,9 @@ class MobileLegendsController extends Controller
                 $order->gross_price = $grossPrice;
                 $order->save();
             }
-            return response()->json(['message' => 'Transaksi sukses', 'data' => $responseData]);
+
+
+            return response()->json(['data' => $responseData]);
         } else {
             // Tangani kesalahan
             if ($response->failed()) {

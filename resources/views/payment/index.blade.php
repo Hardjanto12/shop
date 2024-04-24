@@ -73,9 +73,15 @@
                         .then(data => {
                             // Handle respons sukses
                             // Tambahkan refId ke URL sebagai query parameter
-                            window.location.href =
-                                "{{ route('transaction.success') }}" + "?refId=" +
-                                refId; // Redirect ke halaman sukses setelah berhasil dengan refId
+                            console.log(data);
+
+                            Object.keys(data).forEach(key => {
+                                console.log(data[key].message);
+                            });
+
+                            // Redirect ke halaman sukses setelah berhasil dengan refId
+                            window.location.href = "{{ route('transaction.success') }}" +
+                                "?refId=" + refId;
                         })
                         .catch(error => {
                             // Handle error
