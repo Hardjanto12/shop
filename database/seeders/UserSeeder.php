@@ -17,28 +17,28 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Anastasya Yasmeen',
                 'email' => 'yasmeen@mail.com',
-                'password' => 'yasmeen'
+                'password' => '12345678'
             ]
         );
         User::create(
             [
                 'name' => 'Serafine',
                 'email' => 'ppinponn@mail.com',
-                'password' => 'yasmeen'
+                'password' => '12345678'
             ]
         );
         User::create(
             [
                 'name' => 'Nastasia Adeline',
                 'email' => 'adeline@mail.com',
-                'password' => 'adeline'
+                'password' => '12345678'
             ]
         );
         User::create(
             [
                 'name' => 'Hannalia Valentine',
                 'email' => 'lelelent@mail.com',
-                'password' => 'lelelelent'
+                'password' => '12345678'
             ]
         );
     }

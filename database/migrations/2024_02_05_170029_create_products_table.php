@@ -25,7 +25,8 @@ return new class extends Migration
             $table->string('item');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
-            $table->foreignId('category_id');
+            $table->string('category_code');
+            $table->boolean('status');
             $table->timestamps();
         });
     }

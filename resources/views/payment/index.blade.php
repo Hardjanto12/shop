@@ -72,16 +72,17 @@
                         })
                         .then(data => {
                             // Handle respons sukses
-                            // Tambahkan refId ke URL sebagai query parameter
-                            console.log(data);
+                            console.log(data.status);
 
-                            Object.keys(data).forEach(key => {
-                                console.log(data[key].message);
-                            });
+                            if (data.status == 'gagal') {
+                                alert('Transaksi gagal \n ' + data.message);
+                            } else {
+                                // Redirect ke halaman sukses setelah berhasil dengan refId
+                                window.location.href = "{{ route('transaction.success') }}" +
+                                    "?refId=" + refId;
+                            }
 
-                            // Redirect ke halaman sukses setelah berhasil dengan refId
-                            window.location.href = "{{ route('transaction.success') }}" +
-                                "?refId=" + refId;
+
                         })
                         .catch(error => {
                             // Handle error

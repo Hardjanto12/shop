@@ -20,7 +20,8 @@ return new class extends Migration
             $table->string('server_num');
             $table->string('email');
             $table->string('status')->default('pending');
-            $table->string('payment_id')->nullable();
+            $table->string('gross_price')->nullable();
+            $table->string('snap_token')->nullable();
             $table->timestamps();
         });
     }

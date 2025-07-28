@@ -15,23 +15,12 @@ class MobileLegendsController extends Controller
 {
     public function index()
     {
-        /* This code snippet is making an HTTP GET request to the specified URL
-        It then retrieves the JSON response from the request and sorts the data based on
-        the 'id' key in ascending order using Laravel Collection methods. Finally, it converts the
-        sorted data back to an array. */
-        $response = Http::get('https://api.tokovoucher.id/produk/code?member_code=M240317FBIE2346GZ&signature=f8a6768c402b84dbf3583e41ad3e9825&kode=MLA');
-
-        $data = $response->json();
-        $sortedData = collect($data['data'])->sortBy('id')->values()->all();
-
         $categoryId = Category::where('slug', 'mobile-legends')->first();
-        $products = Product::where('category_id', $categoryId->id)
-            ->orderBy('item')
+        $products = Product::where('category_code', $categoryId->code)->where('status', true)
+            ->orderBy('price')
             ->get();
 
-        return view('orders.mobile-legends.index')->with(['product' => $products, 'jsonData' => $sortedData]);
-
-        // return view('products.index', compact('products'));
+        return view('orders.mobile-legends.index')->with(['product' => $products]);
     }
 
     public function fetch()
@@ -52,6 +41,8 @@ class MobileLegendsController extends Controller
 
     public function placeOrder(Request $request)
     {
+
+        // validate user id and server num
         // Validate request data
         $request->validate([
             'game_id' => 'required',
@@ -69,10 +60,9 @@ class MobileLegendsController extends Controller
 
         /* This line of code is querying the `Product` model to retrieve the `id` of a product based on the
     provided `product_serial_number`.*/
-        $product_id = Product::where('product_serial_number', $item)->get()->pluck('id')->first();
+        $product_id = Product::where('product_serial_number', $item)->get()->pluck('product_serial_number')->first();
         $product_price = Product::where('product_serial_number', $item)->get()->pluck('price')->first();
         $game = 'ML';
-
         // Start a database transaction
         DB::beginTransaction();
         try {
@@ -82,12 +72,13 @@ class MobileLegendsController extends Controller
             $usercount = DB::table('orders')->count() + 1;
 
             /* The code block you provided is determining the user ID based on whether the user is authenticated or
-        not. Here's a breakdown of what it does: */
-            if (Auth::check() == false) {
-                $user_id = "GUEST/" . sprintf("%04d", $usercount) . '/' . $game_id;
-            } else {
-                $user_id = "USER/" . sprintf("%04d", (Auth::user()->id)) . '/' . $game_id;
-            }
+            not. Here's a breakdown of what it does: */
+            // if (Auth::check() == false) {
+            //     $user_id = "GUEST/" . sprintf("%04d", $usercount) . '/' . $game_id;
+            // } else {
+            //     $user_id = "USER/" . sprintf("%04d", (Auth::user()->id)) . '/' . $game_id;
+            // }
+            $user_id = sprintf("%04d", $usercount) . '/' . $game_id;
 
             $generate_serial_number = $game . date("dmy") . sprintf("%04d", $usercount);
             /*  generating a unique order serial number for the order being created. */
@@ -97,6 +88,8 @@ class MobileLegendsController extends Controller
             $order->game_id = $game_id;
             $order->server_num = $server_num;
             $order->email = $email;
+            $order->gross_price = $product_price;
+
 
             // Set your Merchant Server Key
             \Midtrans\Config::$serverKey = config('midtrans.serverKey');
@@ -109,18 +102,20 @@ class MobileLegendsController extends Controller
 
             $order->save();
 
+
             // Order Detail
             $orderItem = new OrderItem();
 
             /* The line is generating a unique order item serial number for the order item being created. */
             $orderItem->order_item_serial_number = $game . '/' . sprintf("%04d", $usercount) . '/' . $game_id;
             $orderItem->order_serial_number = $generate_serial_number;
-            $orderItem->product_id = $product_id;
+            $orderItem->product_code = $product_id;
 
             $orderItem->save();
-
             /* This block of code is responsible for generating a unique Snap token for the payment transaction
-        using the Midtrans payment gateway. Here's a breakdown of what it does: */
+            using the Midtrans payment gateway. Here's a breakdown of what it does: */
+
+
 
             $params = array(
                 'transaction_details' => array(
@@ -130,6 +125,7 @@ class MobileLegendsController extends Controller
             );
 
             $snapToken = \Midtrans\Snap::getSnapToken($params);
+
 
             $order->snap_token = $snapToken;
             $order->save();
@@ -147,16 +143,16 @@ class MobileLegendsController extends Controller
 
     public function payment()
     {
-        return view('payment.index');
+        return view('orders.mobile-legends.payment');
     }
 
     public function executeOrder(Request $request)
     {
 
         $refId = $request->input('refId');
-        $produk_id = OrderItem::where('order_serial_number', $refId)->get()->pluck('product_id')->first();
-        $produkCode = Product::where('id', $produk_id)->get()->pluck('product_serial_number')->first();
-        $grossPrice = Product::where('id', $produk_id)->get()->pluck('price')->first();
+        $product_id = OrderItem::where('order_serial_number', $refId)->get()->pluck('product_code')->first();
+
+        // $produkCode = Product::where('id', $produk_id)->get()->pluck('product_serial_number')->first();
 
         $tujuan = Order::where('order_serial_number', $refId)->get()->pluck('game_id')->first();
         $server_id = Order::where('order_serial_number', $refId)->get()->pluck('server_id')->first();
@@ -167,7 +163,7 @@ class MobileLegendsController extends Controller
 
         $response = Http::post('https://api.tokovoucher.id/v1/transaksi', [
             'ref_id' => $refId,
-            'produk' => $produkCode,
+            'produk' => $product_id,
             'tujuan' => $tujuan,
             'server_id' => $server_id,
             'member_code' => 'M240317FBIE2346GZ',
@@ -181,16 +177,7 @@ class MobileLegendsController extends Controller
 
             return $responseData;
 
-            // Update status order dari "pending" menjadi "success"
-            $order = Order::where('order_serial_number', $refId)->first();
-            if ($order) {
-                $order->status = 'success';
-                $order->gross_price = $grossPrice;
-                $order->save();
-            }
-
-
-            return response()->json(['data' => $responseData]);
+            // return response()->json(['data' => $responseData]);
         } else {
             // Tangani kesalahan
             if ($response->failed()) {
@@ -205,7 +192,22 @@ class MobileLegendsController extends Controller
 
     public function success(Request $request)
     {
-        $refId = $request->session()->get('refId', 'Tidak ada referensi ID');
+        $order = new Order();
+
+        // $refId = $request->session()->get('refId', 'Tidak ada referensi ID');
+        $refId = $request->input('refId');
+
+        // Update status order dari "pending" menjadi "success"
+        $order = Order::where('order_serial_number', $refId)->first();
+        $produk_id = OrderItem::where('order_serial_number', $refId)->get()->pluck('product_code')->first();
+        $grossPrice = Product::where('product_serial_number', $produk_id)->get()->pluck('price')->first();
+
+
+        $order->status = 'success';
+        $order->gross_price = $grossPrice;
+        $order->save();
+
+
         return view('transaction-success.index')->with('refId', $refId);
     }
 }

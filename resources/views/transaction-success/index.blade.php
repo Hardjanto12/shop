@@ -8,8 +8,8 @@
             <strong class="font-bold">Berhasil!</strong>
             <span class="block sm:inline">Transaksi Anda telah berhasil diproses.</span>
         </div>
-        <p>ID Referensi Transaksi Anda adalah: <strong>{{ request()->refId }}</strong></p>
-        <div class="mt-4">
+        <p class="text-gray-300 mt-4">ID Referensi Transaksi Anda adalah: <strong>{{ request()->refId }}</strong></p>
+        <div class="mt-4 text-gray-300">
             @php
                 use App\Models\Order;
                 $order = Order::where('order_serial_number', request()->refId)->first();
@@ -26,4 +26,8 @@
                 Beranda</a>
         </div>
     </div>
+@endsection
+
+
+@section('scripts')
 @endsection

@@ -9,7 +9,7 @@
         <ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
             {{-- @dd($jsonData) --}}
             @foreach ($jsonData as $item)
-                <li>{{ $item['code'] }}, {{ $item['nama_produk'] }}, {{ $item['deskripsi'] }} , {{ $item['price'] }} </li>
+                <li>{{ $item['code'] }}, {{ $item['nama_produk'] }}, {{ $item['price'] }} </li>
             @endforeach
         </ul>
     </div>

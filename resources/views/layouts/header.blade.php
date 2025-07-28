@@ -1,47 +1,40 @@
-<nav class="relative px-4 pb-0 pt-4 flex justify-between items-center bg-transparent">
-    <a class="text-3xl font-bold leading-none" href="{{ route('home') }}">
-        <img class="object-cover rounded-full object-center bg-second-300 w-10 h-10 overflow-hidden" title="logo"
-            src="/img/kathrinjkt.jpg">
+<header
+    class="header sticky top-0 bg-[#191E29]  shadow-md flex items-center justify-between backdrop-blur-xl bg-[#191E29]/30 px-8 py-02 no-highlights z-50">
+    <!-- logo -->
+    <a href="#" class="w-3/12 font-semibold">
+        <h1 class=" text-slate-300 hover:text-orange-500 hover:underline underline-offset-2 uppercase">
+            WinnnStore
+        </h1>
     </a>
-    <div class="lg:hidden">
-        <button class="navbar-burger flex items-center text-main p-3">
-            <svg class="block h-4 w-4 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <title>Mobile menu</title>
-                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
-            </svg>
-        </button>
-    </div>
-    <ul
-        class="hidden absolute top-11 left-1/2 transform -translate-y-1/2 -translate-x-1/2 lg:flex lg:mx-auto lg:items-center lg:w-auto lg:space-x-6">
-        <li><a class="text-lg font-bold uppercase text-theme-dark hover:text-theme-pink mx-2"
-                href="{{ route('home') }}">Home</a>
-        </li>
-        {{-- <li class="text-gray-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" class="w-4 h-4 current-fill"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>
-        </li> --}}
-        <li><a class="text-lg font-bold uppercase text-theme-dark hover:text-theme-pink mx-2"
-                href="{{ route('categories') }}">Games</a></li>
-        <li>
-            <a class="text-lg font-bold uppercase text-theme-dark hover:text-theme-pink mx-2"
-                href="{{ route('mobile-legends') }}">Top Up Mobile Legends</a>
-        </li>
-    </ul>
-    @guest
-        <a class="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 font-bold bg-theme-white hover:bg-theme-secondary-white hover:text-theme-pink text-md text-theme-dark rounded-xl transition duration-200"
-            href="{{ route('login') }}">Login</a>
-        <a class="hidden lg:inline-block bg-theme-pink text-theme-white hover:text-theme-secondary-white py-2 px-6 text-md font-bold rounded-xl transition duration-200"
-            href="{{ route('register') }}">Register</a>
-    @else
-        <a class="hidden lg:inline-block py-2 px-6 bg-main hover:bg-red-600 text-sm text-white font-bold rounded-xl transition duration-200"
-            href="{{ route('signout') }}">Logout</a>
-    @endguest
-</nav>
+
+    <!-- navigation -->
+    <nav class="nav font-bold text-sm text-slate-300 w-3/12 flex justify-end">
+        <ul class="flex items-center">
+            <a href="{{ route('home') }}">
+                <li
+                    class="p-4 uppercase border-b-4 border-orange-500 border-opacity-0 hover:border-opacity-100 hover:text-orange-500 duration-200 cursor-pointer {{ request()->is('/home') ? 'active' : '' }} active:border-opacity-100 active:text-orange-500">
+                    Home
+                </li>
+            </a>
+            <a href="{{ route('mobile-legends') }}">
+                <li
+                    class="p-4 uppercase border-b-4 border-orange-500 border-opacity-0 hover:border-opacity-100 hover:text-orange-500 duration-200 cursor-pointer {{ request()->is('/mobile-legends') ? 'active' : '' }} active:border-opacity-100 active:text-orange-500">
+                    Mobile Legends
+                </li>
+            </a>
+            <a href="{{ route('valorant') }}">
+                <li
+                    class="p-4 uppercase border-b-4 border-orange-500 border-opacity-0 hover:border-opacity-100 hover:text-orange-500 duration-200 cursor-pointer {{ request()->is('/valorant') ? 'active' : '' }} active:border-opacity-100 active:text-orange-500">
+                    Valorant
+                </li>
+            </a>
+        </ul>
+    </nav>
+</header>
+
+
 <div class="navbar-menu relative z-50 hidden">
-    <div class="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
+    <div class="navbar-backdrop fixed inset-0 bg-neutral-950 opacity-25"></div>
     <nav
         class="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-dark border-r border-main overflow-y-auto">
         <div class="flex items-center mb-8">
@@ -65,26 +58,15 @@
                 </li>
                 <li class="mb-1">
                     <a class="block p-4 text-md font-semibold text-gray-400 hover:bg-red-50 hover:text-theme-pink rounded"
-                        href="{{ route('categories') }}">Games</a>
+                        href="{{ route('mobile-legends') }}">Mobile Legends</a>
                 </li>
                 <li class="mb-1">
                     <a class="block p-4 text-md font-semibold text-gray-400 hover:bg-red-50 hover:text-theme-pink rounded"
-                        href="{{ route('mobile-legends') }}">Top Up Mobile Legends</a>
+                        href="{{ route('valorant') }}">Valorant</a>
                 </li>
             </ul>
         </div>
         <div class="mt-auto">
-            @guest
-                <div class="pt-6">
-                    <a class="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold bg-gray-50 hover:bg-gray-100 rounded-xl"
-                        href="{{ route('login') }}">Login</a>
-                    <a class="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-main hover:bg-theme-pink  rounded-xl"
-                        href="{{ route('register') }}">Register</a>
-                @else
-                    <a class="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-main hover:bg-theme-pink rounded-xl"
-                        href="{{ route('signout') }}">Logout</a>
-                </div>
-            @endguest
             <p class="my-4 text-xs text-center text-gray-400">
                 <span>Copyright © 2024</span>
             </p>

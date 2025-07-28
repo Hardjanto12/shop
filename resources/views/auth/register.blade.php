@@ -39,7 +39,7 @@
                                     </div>
                                 </div>
                                 <div class="d-grid mx-auto">
-                                    <button type="submit" class="btn btn-dark btn-block border-neutral-900 text-icons">Sign
+                                    <button type="submit" class="btn btn-block border-neutral-900 text-icons">Sign
                                         up</button>
                                 </div>
                             </form>

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_item_serial_number');
             $table->string('order_serial_number');
-            $table->foreignId('product_id');
+            $table->string('product_code');
             $table->timestamps();
         });
     }
